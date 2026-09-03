@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.next/
+coverage/
+*.tsbuildinfo
+
+# secrets: keys live only in local env files
+.env
+.env.*
+!.env.example
+
+.DS_Store
+
+NOTES.md
+PLAN.md

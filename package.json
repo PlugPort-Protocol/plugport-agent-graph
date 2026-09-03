@@ -1,0 +1,15 @@
+{
+    "name": "plugport-agent-graph",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Verifiable memory graph for AI agents on Monad, built on PlugPort",
+    "scripts": {
+        "build": "pnpm -r build",
+        "test": "pnpm -r test",
+        "typecheck": "pnpm -r typecheck"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "packageManager": "pnpm@10.22.0"
+}

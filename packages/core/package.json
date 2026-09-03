@@ -1,0 +1,30 @@
+{
+    "name": "@pag/core",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Agent memory graph on top of PlugPort: client, graph, memory, hashing",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "test": "vitest run --exclude \"test/live*\"",
+        "test:live": "vitest run --no-file-parallelism test/live.test.ts test/live-semantics.test.ts test/live-anchor.test.ts",
+        "clean": "rm -rf dist"
+    },
+    "dependencies": {
+        "ethers": "^6.13.0"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "typescript": "^5.7.0",
+        "vitest": "^3.0.0"
+    }
+}
