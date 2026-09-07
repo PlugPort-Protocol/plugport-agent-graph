@@ -1,0 +1,126 @@
+{
+  "contractName": "MemoryAnchor",
+  "compiler": "0.8.34+commit.80d5c536.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "root",
+          "type": "bytes32"
+        }
+      ],
+      "name": "AlreadyAnchored",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "EmptyBatch",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "EmptyRoot",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "root",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "count",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "graph",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "at",
+          "type": "uint256"
+        }
+      ],
+      "name": "Anchored",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "root",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "count",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "graph",
+          "type": "string"
+        }
+      ],
+      "name": "anchor",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "anchoredAt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "anchoredBy",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600e575f5ffd5b506102b58061001c5f395ff3fe608060405234801561000f575f5ffd5b506004361061003f575f3560e01c80635e1374e4146100435780639591a6101461005857806395b296021461008a575b5f5ffd5b6100566100513660046101ae565b6100ca565b005b61007761006636600461022a565b5f6020819052908152604090205481565b6040519081526020015b60405180910390f35b6100b261009836600461022a565b60016020525f90815260409020546001600160a01b031681565b6040516001600160a01b039091168152602001610081565b836100e8576040516329e7276760e11b815260040160405180910390fd5b825f036101085760405163c2e5347d60e01b815260040160405180910390fd5b5f848152602081905260409020541561013b576040516330d2381360e01b81526004810185905260240160405180910390fd5b5f84815260208181526040808320429081905560019092529182902080546001600160a01b0319163390811790915591518692917f91287a1e690971e450d5f6acdf5dd6c36fcc445f3b53f5174dd1f559971aa376916101a091889188918891610241565b60405180910390a350505050565b5f5f5f5f606085870312156101c1575f5ffd5b8435935060208501359250604085013567ffffffffffffffff8111156101e5575f5ffd5b8501601f810187136101f5575f5ffd5b803567ffffffffffffffff81111561020b575f5ffd5b87602082840101111561021c575f5ffd5b949793965060200194505050565b5f6020828403121561023a575f5ffd5b5035919050565b84815260606020820152826060820152828460808301375f608084830101525f6080601f19601f86011683010190508260408301529594505050505056fea2646970667358221220ca7b1bdba9fe9aac2af164ef5c0bc221826f378e88dbc703f45049fcdaa068ce64736f6c63430008220033"
+}

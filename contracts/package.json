@@ -1,0 +1,15 @@
+{
+    "name": "@pag/contracts",
+    "version": "0.1.0",
+    "private": true,
+    "description": "MemoryAnchor contract: Merkle roots of agent memory batches on Monad",
+    "type": "module",
+    "scripts": {
+        "compile": "node compile.mjs",
+        "deploy:testnet": "node deploy.mjs"
+    },
+    "dependencies": {
+        "ethers": "^6.13.0",
+        "solc": "0.8.34"
+    }
+}
