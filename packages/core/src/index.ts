@@ -8,6 +8,7 @@ export * from './graph.js';
 export * from './memory.js';
 export * from './merkle.js';
 export * from './anchor.js';
+export * from './memory-store.js';
 
 import { PlugPortClient, type PlugPortClientOptions } from './plugport.js';
 import { GraphStore } from './graph.js';

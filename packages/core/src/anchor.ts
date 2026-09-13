@@ -86,6 +86,34 @@ export class EthersAnchorChain implements AnchorChain {
     }
 }
 
+/**
+ * A chain kept in memory: anchors land instantly with a fake tx hash. For
+ * tests and offline rehearsals, never for real verification.
+ */
+export class InMemoryAnchorChain implements AnchorChain {
+    readonly contractAddress = '0x0000000000000000000000000000000000000000';
+    private readonly roots = new Map<string, OnChainAnchor>();
+    private txCount = 0;
+
+    constructor(readonly signerAddress: string | null = '0x00000000000000000000000000000000000a11ce') {}
+
+    async chainId(): Promise<number> {
+        return 0;
+    }
+
+    async anchor(root: string): Promise<AnchorReceipt> {
+        if (!this.signerAddress) throw new Error('Anchoring needs a signer (this chain is read-only)');
+        if (this.roots.has(root)) throw new Error(`AlreadyAnchored(${root})`);
+        this.roots.set(root, { at: Date.now(), by: this.signerAddress });
+        this.txCount++;
+        return { txHash: `0x${this.txCount.toString(16).padStart(64, '0')}`, blockNumber: this.txCount };
+    }
+
+    async lookup(root: string): Promise<OnChainAnchor | null> {
+        return this.roots.get(root) ?? null;
+    }
+}
+
 export interface AnchorerOptions {
     /** Block explorer tx URL prefix, e.g. https://testnet.monadscan.com/tx/ */
     explorerTxUrl?: string;
