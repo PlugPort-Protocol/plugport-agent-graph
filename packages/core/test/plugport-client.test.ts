@@ -87,6 +87,13 @@ describe('PlugPortClient', () => {
         expect(denied.isDuplicateKey).toBe(false);
     });
 
+    it('names the HTTP status when PlugPort sends an empty error message', async () => {
+        const { fn } = mockFetch([{ status: 500, body: { ok: 0, errmsg: '' } }]);
+        const client = new PlugPortClient({ url: 'http://pp.test', fetch: fn });
+        const err = await client.find('c', {}).catch((e) => e);
+        expect(err).toMatchObject({ status: 500, message: expect.stringMatching(/^PlugPort returned HTTP 500/) });
+    });
+
     it('reports an unreachable server', async () => {
         const fn = (async () => { throw new TypeError('fetch failed'); }) as unknown as typeof fetch;
         await expect(new PlugPortClient({ url: 'http://down.test', fetch: fn }).count('c', {}))

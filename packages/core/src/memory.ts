@@ -134,10 +134,18 @@ export class Memory {
         const memory = nodes.find((n) => n._id === id)!;
         const entityNodes = nodes.filter((n) => n._id !== id);
 
-        const edges = await this.graph.upsertEdges([
-            ...entityNodes.map((n) => ({ from: id, type: MENTIONS, to: n._id })),
-            ...relations,
-        ]);
+        let edges: GraphEdge[];
+        try {
+            edges = await this.graph.upsertEdges([
+                ...entityNodes.map((n) => ({ from: id, type: MENTIONS, to: n._id })),
+                ...relations,
+            ]);
+        } catch (err) {
+            // Don't leave a memory without its links behind (a retry would
+            // duplicate it). Entities stay: they're shared and idempotent.
+            await this.graph.deleteNode(id).catch(() => undefined);
+            throw err;
+        }
 
         return { memory, entities: entityNodes, edges };
     }

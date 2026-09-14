@@ -106,10 +106,9 @@ export class PlugPortClient implements DocStore {
                 await sleep(delay);
                 continue;
             }
-            const message = typeof payload?.errmsg === 'string' ? payload.errmsg
-                : typeof payload?.error === 'string' ? payload.error
-                : typeof payload?.message === 'string' ? payload.message
-                : response.statusText || 'Request failed';
+            const text = (v: unknown) => (typeof v === 'string' && v.trim() ? v : null);
+            const message = text(payload?.errmsg) ?? text(payload?.error) ?? text(payload?.message)
+                ?? `PlugPort returned HTTP ${response.status}${response.statusText ? ` ${response.statusText}` : ''}`;
             throw new PlugPortError(response.status, typeof payload?.code === 'number' ? payload.code : undefined, message);
         }
     }

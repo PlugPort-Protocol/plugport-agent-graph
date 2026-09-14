@@ -35,6 +35,23 @@ async function seedDefi() {
 }
 
 describe('remember', () => {
+    it('removes the memory again when its edges fail to save, so a retry does not duplicate it', async () => {
+        const graph = new GraphStore(store);
+        const insert = store.insertMany.bind(store);
+        store.insertMany = async (collection, docs) => {
+            if (collection === graph.edgesCollection) throw new Error('PlugPort returned HTTP 500');
+            return insert(collection, docs);
+        };
+        const input = { text: 'User caps slippage at 1%.', entities: [{ label: 'User', name: 'me' }] };
+        await expect(memory.remember(input)).rejects.toThrow('HTTP 500');
+        expect(store.all(graph.nodesCollection).filter((n) => n.label === 'Memory')).toEqual([]);
+        expect(store.all(graph.nodesCollection).map((n) => n._id)).toEqual(['user_me']);
+
+        store.insertMany = insert;
+        await memory.remember(input);
+        expect(store.all(graph.nodesCollection).filter((n) => n.label === 'Memory').length).toBe(1);
+    });
+
     it('writes the memory, entities and edges in two write requests', async () => {
         const { memory: m, entities, edges } = await memory.remember({
             text: 'Alice leads Project Atlas, which launches on Nov 1.',
