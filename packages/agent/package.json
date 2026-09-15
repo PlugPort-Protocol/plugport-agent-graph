@@ -1,0 +1,23 @@
+{
+    "name": "@pag/agent",
+    "version": "0.1.0",
+    "private": true,
+    "description": "DeFi demo agent on Gemma 4 with verifiable memory from @pag/core",
+    "type": "module",
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "test": "vitest run",
+        "agent": "node dist/cli.js",
+        "demo": "node dist/cli.js demo"
+    },
+    "dependencies": {
+        "@pag/core": "workspace:*",
+        "@google/genai": "^1.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "typescript": "^5.7.0",
+        "vitest": "^3.0.0"
+    }
+}

@@ -13,7 +13,7 @@ agent wallet's own namespace (private by default), and batches of memory hashes 
 |---|---|
 | `packages/core` (`@pag/core`): PlugPort client, graph, memory, hashing | ✅ done |
 | `contracts` (MemoryAnchor) + anchoring/verify in core | ✅ done, deployed on Monad testnet at `0x12a49Ee0c56dA65Eb519cC612Ee4D3A4A089c1f4` |
-| `packages/agent`: DeFi demo agent | Phase 3 |
+| `packages/agent`: DeFi demo agent on Gemma 4 | ✅ done |
 | `packages/mcp`: MCP server | Phase 4 |
 | `packages/web`: viewer | Phase 5 |
 
@@ -29,6 +29,22 @@ pnpm --filter @pag/contracts run deploy:testnet   # deploy MemoryAnchor, saves A
 ```
 
 On this machine, use the standalone Windows pnpm (see docs/NOTES.md §6b).
+
+## Demo
+
+```bash
+pnpm build
+pnpm demo                                   # Gemma 4 + PlugPort testnet + Monad anchoring (needs GEMINI_API_KEY)
+pnpm demo --offline                         # same, with an in-memory store and chain (fast rehearsal)
+pnpm demo --scripted                        # no model: the same story through the same tools
+pnpm agent chat                             # talk to the agent yourself
+```
+
+Session 1 tells the agent "never more than 1% slippage, never touch SCAM", then asks for a swap at
+the best quote: pool MON/USDC-A quotes best but slips 3.2%, so the swap fails and the agent remembers
+that. Session 2 is a new agent with an empty chat history: it recalls the rule and the failure from
+PlugPort, swaps on MON/USDC-B instead, and refuses to buy SCAM. The demo then checks that behavior and
+verifies a memory against its Monad anchor. Swaps are mock (no DEX calls); memory and anchoring are real.
 
 ## Usage
 

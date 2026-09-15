@@ -6,7 +6,9 @@
     "scripts": {
         "build": "pnpm -r build",
         "test": "pnpm -r test",
-        "typecheck": "pnpm -r typecheck"
+        "typecheck": "pnpm -r typecheck",
+        "demo": "node packages/agent/dist/cli.js demo",
+        "agent": "node packages/agent/dist/cli.js"
     },
     "engines": {
         "node": ">=20.0.0"
