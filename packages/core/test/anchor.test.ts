@@ -6,6 +6,7 @@ import { GraphStore } from '../src/graph.js';
 import { Memory } from '../src/memory.js';
 import { Anchorer, MEMORY_ANCHOR_ABI, type AnchorChain, type AnchorReceipt, type OnChainAnchor } from '../src/anchor.js';
 import { hashMemory } from '../src/hash.js';
+import { verifyMerkleProof } from '../src/merkle.js';
 import { GraphError } from '../src/errors.js';
 import type { AnchorRecord } from '../src/types.js';
 import { FakeStore } from './fake-store.js';
@@ -155,7 +156,9 @@ describe('verify', () => {
             explorerUrl: batch!.explorerUrl, proofValid: true, onChain: true, anchoredBy: SIGNER,
             verified: true, problem: null,
         });
-        expect(v.proof.length).toBe(2); // 3 leaves
+        // 3 leaves: 2 proof steps, or 1 for the leaf that sorts last (it moves up unpaired)
+        expect(v.proof.length).toBe(v.leafIndex === 2 ? 1 : 2);
+        expect(verifyMerkleProof(v.computedHash, v.proof, v.root!)).toBe(true);
     });
 
     it('reports an unanchored memory', async () => {
