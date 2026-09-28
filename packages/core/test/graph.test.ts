@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { GraphStore } from '../src/graph.js';
+import { graphsFromCollections, GraphStore } from '../src/graph.js';
 import { GraphError, PlugPortError } from '../src/errors.js';
 import { edgeId } from '../src/ids.js';
 import { FakeStore } from './fake-store.js';
@@ -174,5 +174,23 @@ describe('traversal', () => {
         const s = await g.snapshot(10);
         expect(s.nodes).toHaveLength(3);
         expect(s.edges).toHaveLength(2);
+    });
+});
+
+describe('graphsFromCollections', () => {
+    it('finds the caller\'s graphs, newest first, skipping empty and foreign ones', () => {
+        expect(graphsFromCollections([
+            { name: 'mem_nodes', documentCount: 5, createdAt: 1 },
+            { name: 'mem_edges', documentCount: 7, createdAt: 1 },
+            { name: 'mem_demo-1_nodes', documentCount: 3, createdAt: 9 },
+            { name: 'mem_demo-1_anchors', documentCount: 1, createdAt: 10 },
+            { name: 'mem_old_nodes', documentCount: 0, createdAt: 20 },
+            { name: '0xabc.mem_nodes', documentCount: 4, createdAt: 30 },
+            { name: 'users', documentCount: 2, createdAt: 40 },
+            { name: 'mem_x_probe', documentCount: 2, createdAt: 50 },
+        ])).toEqual([
+            { graph: 'demo-1', nodes: 3, edges: 0, anchors: 1, createdAt: 10 },
+            { graph: 'default', nodes: 5, edges: 7, anchors: 0, createdAt: 1 },
+        ]);
     });
 });

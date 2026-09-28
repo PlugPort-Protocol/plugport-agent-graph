@@ -462,3 +462,32 @@ export function clamp(value: number, min: number, max: number): number {
     if (!Number.isFinite(value)) return min;
     return Math.min(max, Math.max(min, Math.floor(value)));
 }
+
+export interface GraphInfo {
+    graph: string;
+    nodes: number;
+    edges: number;
+    anchors: number;
+    createdAt: number;
+}
+
+const GRAPH_COLLECTION = /^mem_(?:([a-z0-9][a-z0-9-]{0,31})_)?(nodes|edges|anchors)$/;
+
+/**
+ * The caller's own graphs, from a PlugPort collection listing (mem_nodes is
+ * the "default" graph, mem_<graph>_nodes the others). Newest first; graphs
+ * whose nodes collection is empty or gone are left out.
+ */
+export function graphsFromCollections(collections: { name: string; documentCount?: number; createdAt?: number }[]): GraphInfo[] {
+    const graphs = new Map<string, GraphInfo>();
+    for (const c of collections) {
+        const match = GRAPH_COLLECTION.exec(c.name);
+        if (!match) continue;
+        const name = match[1] ?? 'default';
+        const info = graphs.get(name) ?? { graph: name, nodes: 0, edges: 0, anchors: 0, createdAt: 0 };
+        info[match[2] as 'nodes' | 'edges' | 'anchors'] = c.documentCount ?? 0;
+        info.createdAt = Math.max(info.createdAt, c.createdAt ?? 0);
+        graphs.set(name, info);
+    }
+    return [...graphs.values()].filter((g) => g.nodes > 0).sort((a, b) => b.createdAt - a.createdAt);
+}

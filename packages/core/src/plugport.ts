@@ -20,6 +20,14 @@ export interface PlugPortClientOptions {
     fetch?: typeof fetch;
 }
 
+export interface CollectionInfo {
+    name: string;
+    documentCount?: number;
+    createdAt?: number;
+    ownerAddress?: string;
+    mode?: string;
+}
+
 export class PlugPortClient implements DocStore {
     private readonly url: string;
     private readonly fetchImpl: typeof fetch;
@@ -65,11 +73,17 @@ export class PlugPortClient implements DocStore {
         return this.request<T>(`/api/v1/collections/${encodeURIComponent(collection)}/${op}`, body);
     }
 
-    private async request<T>(path: string, body: unknown): Promise<T> {
+    /** Collections the caller can see: its own, plus others' public or shared ones (dotted names). */
+    async listCollections(): Promise<CollectionInfo[]> {
+        return (await this.request<{ collections?: CollectionInfo[] }>('/api/v1/collections')).collections ?? [];
+    }
+
+    /** POST with a JSON body, or GET when body is undefined. */
+    private async request<T>(path: string, body?: unknown): Promise<T> {
         const retries = this.options.retries ?? 3;
         const baseDelay = this.options.retryDelayMs ?? 1000;
         const timeoutMs = this.options.timeoutMs ?? 30_000;
-        const headers: Record<string, string> = { 'content-type': 'application/json' };
+        const headers: Record<string, string> = body === undefined ? {} : { 'content-type': 'application/json' };
         if (this.options.apiKey) headers['x-api-key'] = this.options.apiKey;
 
         for (let attempt = 0; ; attempt++) {
@@ -80,9 +94,9 @@ export class PlugPortClient implements DocStore {
             let response: Response;
             try {
                 response = await this.fetchImpl(`${this.url}${path}`, {
-                    method: 'POST',
+                    method: body === undefined ? 'GET' : 'POST',
                     headers,
-                    body: JSON.stringify(body),
+                    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
                     signal: controller.signal,
                 });
             } catch (err) {
