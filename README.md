@@ -15,7 +15,7 @@ agent wallet's own namespace (private by default), and batches of memory hashes 
 | `contracts` (MemoryAnchor) + anchoring/verify in core | ✅ done, deployed on Monad testnet at `0x12a49Ee0c56dA65Eb519cC612Ee4D3A4A089c1f4` |
 | `packages/agent`: DeFi demo agent on Gemma 4 | ✅ done |
 | `packages/mcp`: MCP server | Phase 4 |
-| `packages/web`: viewer | Phase 5 |
+| `packages/web`: graph viewer with on-chain verify | ✅ done |
 
 ## Setup
 
@@ -45,6 +45,24 @@ the best quote: pool MON/USDC-A quotes best but slips 3.2%, so the swap fails an
 that. Session 2 is a new agent with an empty chat history: it recalls the rule and the failure from
 PlugPort, swaps on MON/USDC-B instead, and refuses to buy SCAM. The demo then checks that behavior and
 verifies a memory against its Monad anchor. Swaps are mock (no DEX calls); memory and anchoring are real.
+
+## Viewer
+
+```bash
+pnpm build
+pnpm --filter @pag/web start      # http://localhost:3100 (reads the repo-root .env)
+```
+
+Pick a graph, click a memory, press **Verify**: it recomputes the memory's hash, checks its Merkle
+proof against the anchored root, and reads the root from the MemoryAnchor contract on Monad. With
+`VIEWER_ALLOW_TAMPER=true`, **Simulate tampering** edits the memory in PlugPort so you can watch
+verification fail, and **Restore** puts it back. The recall bar runs the same recall the agent uses
+and highlights what it found.
+
+Deploy on Vercel: import the repo, set Root Directory to `packages/web`, and add the env vars
+`PLUGPORT_URL`, `PLUGPORT_API_KEY`, `PAG_GRAPH`, `MONAD_RPC_URL`, `ANCHOR_CONTRACT`, `ANCHOR_ADDRESS`,
+`EXPLORER_TX_URL`, and `VIEWER_PASSWORD` (it shows the wallet's private memories). Never add
+`ANCHOR_PRIVATE_KEY` there.
 
 ## Usage
 
