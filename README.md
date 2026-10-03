@@ -14,8 +14,9 @@ agent wallet's own namespace (private by default), and batches of memory hashes 
 | `packages/core` (`@pag/core`): PlugPort client, graph, memory, hashing | ✅ done |
 | `contracts` (MemoryAnchor) + anchoring/verify in core | ✅ done, deployed on Monad testnet at `0x12a49Ee0c56dA65Eb519cC612Ee4D3A4A089c1f4` |
 | `packages/agent`: DeFi demo agent on Gemma 4 | ✅ done |
-| `packages/mcp`: MCP server | Phase 4 |
+| `packages/mcp`: MCP server (7 tools, zod schemas, stdio transport) | ✅ done |
 | `packages/web`: graph viewer with on-chain verify | ✅ done |
+| `docs/`: Docusaurus site → [wiki-agent-graph.plugport.wtf](https://wiki-agent-graph.plugport.wtf) | ✅ done |
 
 ## Setup
 
@@ -28,15 +29,20 @@ pnpm --filter @pag/core build
 pnpm --filter @pag/contracts run deploy:testnet   # deploy MemoryAnchor, saves ANCHOR_CONTRACT
 ```
 
-On this machine, use the standalone Windows pnpm (see docs/NOTES.md §6b).
+On this machine, use the standalone Windows pnpm (see the [Development Notes](https://wiki-agent-graph.plugport.wtf/notes) §6b).
 
 ## Demo
+
+> [!WARNING]
+> Run `pnpm install && pnpm build` once before the first `pnpm demo` or `pnpm agent`.
+> After that, `predemo` / `preagent` hooks rebuild automatically on each run.
 
 ```bash
 pnpm build
 pnpm demo                                   # Gemma 4 + PlugPort testnet + Monad anchoring (needs GEMINI_API_KEY)
 pnpm demo --offline                         # same, with an in-memory store and chain (fast rehearsal)
 pnpm demo --scripted                        # no model: the same story through the same tools
+pnpm demo --share                           # after the demo: wallet-2 reads wallet-1's graph (needs PLUGPORT_API_KEY_2)
 pnpm agent chat                             # talk to the agent yourself
 ```
 
@@ -63,6 +69,41 @@ Deploy on Vercel: import the repo, set Root Directory to `packages/web`, and add
 `PLUGPORT_URL`, `PLUGPORT_API_KEY`, `PAG_GRAPH`, `MONAD_RPC_URL`, `ANCHOR_CONTRACT`, `ANCHOR_ADDRESS`,
 `EXPLORER_TX_URL`, and `VIEWER_PASSWORD` (it shows the wallet's private memories). Never add
 `ANCHOR_PRIVATE_KEY` there.
+
+## MCP Server
+
+`packages/mcp` is a **stdio MCP server** that exposes all 7 memory tools to any MCP-compatible AI host.
+
+```bash
+pnpm --filter @pag/mcp build
+node packages/mcp/dist/index.js   # stdio transport
+
+# Or via the root script (builds first automatically):
+pnpm mcp
+```
+
+Add to your MCP host's config:
+
+```json
+{
+  "pag-mcp": {
+    "command": "node",
+    "args": ["/path/to/plugport-agent-graph/packages/mcp/dist/index.js"]
+  }
+}
+```
+
+See [`packages/mcp/README.md`](packages/mcp/README.md) and the [full docs](https://wiki-agent-graph.plugport.wtf/mcp/overview) for all tools, schemas, and env vars.
+
+## Documentation
+
+Full documentation is at **[wiki-agent-graph.plugport.wtf](https://wiki-agent-graph.plugport.wtf)**.
+
+To build docs locally:
+
+```bash
+cd docs && pnpm install && pnpm start
+```
 
 ## Usage
 

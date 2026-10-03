@@ -7,8 +7,11 @@
         "build": "pnpm -r build",
         "test": "pnpm -r test",
         "typecheck": "pnpm -r typecheck",
+        "predemo": "pnpm build",
         "demo": "node packages/agent/dist/cli.js demo",
-        "agent": "node packages/agent/dist/cli.js"
+        "preagent": "pnpm build",
+        "agent": "node packages/agent/dist/cli.js",
+        "mcp": "pnpm --filter @pag/mcp build && node packages/mcp/dist/index.js"
     },
     "engines": {
         "node": ">=20.0.0"
