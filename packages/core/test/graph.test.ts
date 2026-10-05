@@ -161,12 +161,28 @@ describe('traversal', () => {
     });
 
     it('ignores unknown start nodes and drops edges to deleted nodes', async () => {
-        expect(await g.traverse('missing')).toEqual({ nodes: [], edges: [], depth: {} });
+        expect(await g.traverse('missing')).toEqual({ nodes: [], edges: [], depth: {}, truncated: false });
         await chain(['a', 'b']);
         store.collections.get('mem_nodes')!.delete('b'); // dangling edge a -> b
         const t = await g.traverse('a');
         expect(t.nodes.map((n) => n._id)).toEqual(['a']);
         expect(t.edges).toEqual([]);
+    });
+
+    it('truncated is false when all nodes fit within the limit', async () => {
+        // Small chain (3 nodes) well under the default cap
+        await chain(['a', 'b', 'c']);
+        const t = await g.traverse('a', { limit: 10 });
+        expect(t.nodes).toHaveLength(3);
+        expect(t.truncated).toBe(false);
+    });
+
+    it('truncated is true when the node cap is hit with frontier nodes remaining', async () => {
+        // Chain of 5 nodes; cap at 3 leaves 2 nodes still in the frontier
+        await chain(['n1', 'n2', 'n3', 'n4', 'n5']);
+        const t = await g.traverse('n1', { limit: 3 });
+        expect(t.nodes.length).toBe(3);
+        expect(t.truncated).toBe(true);
     });
 
     it('snapshot returns recent nodes and the edges among them', async () => {

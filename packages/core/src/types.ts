@@ -42,6 +42,20 @@ export interface Subgraph {
     edges: GraphEdge[];
 }
 
+/**
+ * Result of a breadth-first graph traversal.
+ * Extends Subgraph with per-node depth and a truncation flag.
+ */
+export interface Traversal extends Subgraph {
+    /** Hop distance of each returned node from the nearest start node. */
+    depth: Record<string, number>;
+    /**
+     * True when the node-count cap (300) was reached before all reachable
+     * nodes were visited. Some nodes in the graph are not included.
+     */
+    truncated: boolean;
+}
+
 // ---- document store (the subset of PlugPort's HTTP API we use) ----
 
 export type Filter = Record<string, unknown>;

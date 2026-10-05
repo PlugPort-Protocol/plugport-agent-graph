@@ -156,7 +156,7 @@ describe('recall', () => {
 
     it('returns nothing for unknown terms', async () => {
         await seedDefi();
-        expect(await memory.recall({ query: 'zebra' })).toEqual({ memories: [], context: { nodes: [], edges: [] } });
+        expect(await memory.recall({ query: 'zebra' })).toEqual({ memories: [], context: { nodes: [], edges: [] }, contextTruncated: false });
         expect((await memory.recall({ entity: 'Nobody' })).memories).toEqual([]);
     });
 

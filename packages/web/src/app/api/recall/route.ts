@@ -20,6 +20,7 @@ export async function GET(request: Request) {
             memories: result.memories.map((m) => ({ id: m.memory._id, text: m.memory.text, score: Number(m.score.toFixed(3)), distance: m.distance })),
             nodeIds: result.context.nodes.map((n) => n._id),
             edgeIds: result.context.edges.map((e) => e._id),
+            contextTruncated: result.contextTruncated,
         });
     } catch (err) {
         return errorResponse(err);

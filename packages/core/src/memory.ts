@@ -64,6 +64,11 @@ export interface RecallResult {
     memories: RecalledMemory[];
     /** The nodes and edges around the matches, for display or for the agent. */
     context: Subgraph;
+    /**
+     * True when the context graph hit the 300-node BFS cap and some reachable
+     * nodes were omitted. Surface this as a warning to the caller.
+     */
+    contextTruncated: boolean;
 }
 
 export interface VerifyHashResult {
@@ -170,12 +175,13 @@ export class Memory {
         if (!tokens.length && !entityRef) {
             // Nothing to search for: the most recent memories.
             const recent = await this.recent(limit);
-            const context = recent.length
+            const t = recent.length
                 ? await this.graph.traverse(recent.map((m) => m._id), { maxDepth: hops, limit: CONTEXT_LIMIT })
-                : { nodes: [], edges: [] };
+                : null;
             return {
                 memories: recent.map((memory) => ({ memory, score: 0, hits: 0, distance: 0 })),
-                context: { nodes: context.nodes, edges: context.edges },
+                context: t ? { nodes: t.nodes, edges: t.edges } : { nodes: [], edges: [] },
+                contextTruncated: t?.truncated ?? false,
             };
         }
 
@@ -186,7 +192,7 @@ export class Memory {
             const matches = await this.graph.findNodes({ keywords: { $regex: pattern } }, { limit: SEED_LIMIT });
             for (const n of matches) seeds.add(n._id);
         }
-        if (!seeds.size) return { memories: [], context: { nodes: [], edges: [] } };
+        if (!seeds.size) return { memories: [], context: { nodes: [], edges: [] }, contextTruncated: false };
 
         const t = await this.graph.traverse([...seeds], { maxDepth: hops, limit: CONTEXT_LIMIT });
         const memories = t.nodes
@@ -199,7 +205,7 @@ export class Memory {
             .sort((a, b) => b.score - a.score || b.memory.createdAt - a.memory.createdAt)
             .slice(0, limit);
 
-        return { memories, context: { nodes: t.nodes, edges: t.edges } };
+        return { memories, context: { nodes: t.nodes, edges: t.edges }, contextTruncated: t.truncated };
     }
 
     async recent(limit = 10): Promise<GraphNode[]> {

@@ -18,7 +18,7 @@
 //   filter here is evaluated in full. Don't add indexes on from/to/type/label
 //   without revisiting the filters below.
 
-import type { AnchorRecord, DocStore, Filter, GraphEdge, GraphNode, Props, Subgraph } from './types.js';
+import type { AnchorRecord, DocStore, Filter, GraphEdge, GraphNode, Props, Subgraph, Traversal } from './types.js';
 import { GraphError, PlugPortError } from './errors.js';
 import { assertGraphName, assertLabel, assertNodeId, edgeId, normalizeEdgeType, normalizeWallet } from './ids.js';
 import { keywordString, tokenize } from './text.js';
@@ -56,10 +56,6 @@ export interface TraverseOptions {
     direction?: Direction;
 }
 
-export interface Traversal extends Subgraph {
-    /** Hop distance of each returned node from the nearest start node. */
-    depth: Record<string, number>;
-}
 
 export interface GraphStoreOptions {
     /** Graph name. Default "default" (collections mem_nodes/mem_edges/mem_anchors). */
@@ -330,10 +326,13 @@ export class GraphStore {
         const present = new Set(nodes.map((n) => n._id));
         const depthRecord: Record<string, number> = {};
         for (const n of nodes) depthRecord[n._id] = depth.get(n._id)!;
+        // truncated when the cap was hit but there were still frontier nodes to expand
+        const truncated = depth.size >= limit && frontier.length > 0;
         return {
             nodes,
             edges: [...edges.values()].filter((e) => present.has(e.from) && present.has(e.to)),
             depth: depthRecord,
+            truncated,
         };
     }
 

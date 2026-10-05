@@ -40,6 +40,7 @@ export function Viewer() {
     const [entity, setEntity] = useState('');
     const [recall, setRecall] = useState<{ hits: RecallHit[]; nodes: Set<string>; edges: Set<string> } | null>(null);
     const [recalling, setRecalling] = useState(false);
+    const [graphTruncated, setGraphTruncated] = useState(false);
     /** Node to open once the graph has loaded (?select=<id>). */
     const pendingSelect = useRef<string | null>(null);
 
@@ -83,6 +84,7 @@ export function Viewer() {
         if (!graph) return;
         setSelectedId(null);
         setRecall(null);
+        setGraphTruncated(false);
         const url = new URL(window.location.href);
         url.searchParams.set('graph', graph);
         window.history.replaceState(null, '', url);
@@ -105,8 +107,9 @@ export function Viewer() {
         setError(null);
         try {
             const params = new URLSearchParams({ graph, q: query, entity, hops: '1' });
-            const r = await getJson<{ memories: RecallHit[]; nodeIds: string[]; edgeIds: string[] }>(`/api/recall?${params}`);
+            const r = await getJson<{ memories: RecallHit[]; nodeIds: string[]; edgeIds: string[]; contextTruncated: boolean }>(`/api/recall?${params}`);
             setRecall({ hits: r.memories, nodes: new Set(r.nodeIds), edges: new Set(r.edgeIds) });
+            setGraphTruncated(r.contextTruncated ?? false);
             setTab('memories');
         } catch (e) {
             setError((e as Error).message);
@@ -126,6 +129,9 @@ export function Viewer() {
                 <button className="btn" onClick={() => void load(graph)} disabled={loading}>{loading ? 'Loading…' : 'Refresh'}</button>
                 <div className="stats">
                     {memories.length} memories · {nodes.length - memories.length} entities · {edges.length} edges · {anchors.length} anchors
+                    {graphTruncated && (
+                        <span className="badge warn" title="Recall context exceeded 300 nodes — some connected nodes are not highlighted">⚠ graph truncated</span>
+                    )}
                 </div>
                 <div className="spacer" />
                 {meta?.contract && <div className="stats">MemoryAnchor <code>{short(meta.contract, 6)}</code></div>}
