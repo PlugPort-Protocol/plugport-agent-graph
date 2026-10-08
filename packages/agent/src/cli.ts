@@ -10,7 +10,7 @@
 
 import { createInterface } from 'node:readline/promises';
 import { Agent } from './agent.js';
-import { runDemo, runScriptedDemo } from './demo.js';
+import { runDemo, runScriptedDemo, runShareDemo } from './demo.js';
 import { printEvent, style } from './print.js';
 import { loadEnv, modelFromEnv, setupContext } from './setup.js';
 
@@ -36,10 +36,22 @@ async function main(): Promise<number> {
         const graph = values.graph || `demo-${Date.now().toString(36)}`;
         const { ctx, where } = setupContext({ offline, graph });
         console.log(style.dim(`Memory: ${where}`));
-        if (flags.has('scripted')) return (await runScriptedDemo(ctx)) ? 0 : 1;
-        const model = modelFromEnv();
-        console.log(style.dim(`Model: ${model.name}`));
-        return (await runDemo(model, ctx)) ? 0 : 1;
+        let ok: boolean;
+        if (flags.has('scripted')) {
+            ok = await runScriptedDemo(ctx);
+        } else {
+            const model = modelFromEnv();
+            console.log(style.dim(`Model: ${model.name}`));
+            ok = await runDemo(model, ctx);
+        }
+        if (flags.has('share')) {
+            // wallet-1's address is needed so wallet-2 knows whose namespace to read.
+            // ANCHOR_ADDRESS is the public address of the anchor wallet (already required
+            // for the viewer) — reuse it here as the graph owner identity.
+            const ownerAddress = process.env.ANCHOR_ADDRESS ?? '';
+            await runShareDemo(ctx, ownerAddress);
+        }
+        return ok ? 0 : 1;
     }
 
     if (command === 'run' || command === 'chat') {
@@ -69,7 +81,8 @@ async function main(): Promise<number> {
   pag-agent run "<message>"   one message in a new session
   pag-agent chat              interactive session
   pag-agent demo              the two-session demo, in a fresh graph
-Flags: --offline  --graph <name>  --scripted (demo without the model)`);
+Flags: --offline  --graph <name>  --scripted (demo without the model)
+       --share    after the demo: wallet-2 reads wallet-1's graph (needs PLUGPORT_API_KEY_2 + ANCHOR_ADDRESS)`);
     return command === 'help' ? 0 : 1;
 }
 

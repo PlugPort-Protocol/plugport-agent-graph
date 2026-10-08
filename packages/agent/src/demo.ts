@@ -7,6 +7,7 @@ import { Agent, type AgentReply } from './agent.js';
 import type { ChatModel } from './model.js';
 import { heading, printEvent, printUser, style } from './print.js';
 import { runTool, type ToolContext } from './tools.js';
+import { setupSharedContext } from './setup.js';
 
 export const SESSION_1 = [
     'Remember my rules: I never accept more than 1% slippage on any swap, and I never want to touch the SCAM token.',
@@ -138,4 +139,53 @@ async function verifySection(ctx: ToolContext): Promise<void> {
     console.log(`  "${target.text}"`);
     console.log(`  ${v?.verified ? style.green('✓ verified') : style.red(`✗ ${v?.problem}`)}: proof into root ${v?.root}`);
     if (v?.explorerUrl) console.log(`  anchor tx: ${v.explorerUrl}`);
+}
+
+/**
+ * PLAN.md step 6 — Share the graph with a second wallet and recall from it.
+ *
+ * Wallet-2 (PLUGPORT_API_KEY_2) reads wallet-1's namespace via the `owner`
+ * option in createAgentGraph(). This proves that a PlugPort Agent Graph can
+ * be shared across wallets: the recipient can recall the same verifiable
+ * memories without ever holding wallet-1's private key.
+ *
+ * Prerequisites:
+ *   - PLUGPORT_API_KEY_2 set in .env
+ *   - Wallet-1's graph shared with wallet-2 via PlugPort's grantRole ACL
+ *     (use the PlugPort dashboard or the admin API)
+ *
+ * @param ctx      The wallet-1 ToolContext from the main demo run.
+ * @param ownerAddress  Wallet-1's address (the graph owner).
+ */
+export async function runShareDemo(ctx: ToolContext, ownerAddress: string): Promise<void> {
+    heading('Step 6: Cross-wallet graph sharing (wallet-2 reads wallet-1\'s graph)');
+
+    let shared: ReturnType<typeof setupSharedContext>;
+    try {
+        shared = setupSharedContext(ownerAddress);
+    } catch (err) {
+        console.log(style.dim(`  Skipped: ${(err as Error).message}`));
+        return;
+    }
+
+    console.log(style.dim(`  ${shared.where}`));
+
+    const result = await shared.ctx.memory.recall({
+        query: 'slippage preference avoid failure swap',
+        hops: 1,
+        limit: 10,
+    });
+
+    heading('Wallet-2 recalled from wallet-1\'s graph:');
+    if (result.memories.length === 0) {
+        console.log(style.red('  ✗ No memories found. Is the graph shared? Check PlugPort ACL (grantRole).'));
+        return;
+    }
+    for (const r of result.memories) {
+        console.log(`  • ${r.memory.text}`);
+    }
+    if (result.contextTruncated) {
+        console.log(style.dim('  (context graph truncated at 300 nodes)'));
+    }
+    console.log(style.green(`  ✓ Cross-wallet memory sharing works — ${result.memories.length} memories recalled as wallet-2`));
 }
