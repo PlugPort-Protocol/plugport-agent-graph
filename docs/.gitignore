@@ -1,0 +1,12 @@
+# Docusaurus build output
+build/
+.docusaurus/
+
+# Dependencies
+node_modules/
+
+# Generated lock (committed separately after install)
+# pnpm-lock.yaml
+
+# macOS
+.DS_Store

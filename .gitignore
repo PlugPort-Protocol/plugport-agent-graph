@@ -10,6 +10,3 @@ coverage/
 !.env.example
 
 .DS_Store
-
-NOTES.md
-PLAN.md
