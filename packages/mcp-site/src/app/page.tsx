@@ -54,6 +54,62 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ── Live product showcase ──────────────────────────────────────── */}
+            <div style={{
+                background: 'linear-gradient(135deg, #1a1530 0%, #0f1420 100%)',
+                borderTop: '1px solid var(--border)',
+                borderBottom: '1px solid var(--border)',
+                padding: '32px 24px',
+            }}>
+                <div className="container" style={{ maxWidth: 800, textAlign: 'center' }}>
+                    <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: '0.72rem',
+                        fontFamily: 'var(--mono)',
+                        color: 'var(--green)',
+                        background: 'var(--green-dim)',
+                        border: '1px solid var(--green)',
+                        borderRadius: '20px',
+                        padding: '3px 12px',
+                        marginBottom: '16px',
+                        fontWeight: 600,
+                        letterSpacing: '0.05em',
+                    }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+                        Live on Monad Testnet
+                    </div>
+                    <h2 style={{
+                        fontSize: 'clamp(1.2rem, 3vw, 1.7rem)',
+                        fontWeight: 700,
+                        color: 'var(--text)',
+                        marginBottom: 10,
+                        letterSpacing: '-0.01em',
+                    }}>
+                        See the Agent Graph in action
+                    </h2>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-2)', marginBottom: 20, lineHeight: 1.65 }}>
+                        The Agent Graph Viewer visualises the live knowledge graph, entity relationships, and on-chain Merkle anchors for the DeFi demo agent running on Monad testnet.
+                    </p>
+                    <a
+                        href="https://test-agent-graph.plugport.wtf/"
+                        target="_blank"
+                        rel="noopener"
+                        className="btn btn-primary"
+                        style={{ fontSize: '0.95rem', padding: '12px 28px', display: 'inline-flex' }}
+                    >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
+                            <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm.5 2.5v3.25l2.25 1.3-.5.87L7.5 8.25V4.5h1z"/>
+                        </svg>
+                        Open Testnet Agent Graph Viewer ↗
+                    </a>
+                    <div style={{ marginTop: 16, fontSize: '0.75rem', color: 'var(--text-3)' }}>
+                        Connect via the MCP server below to write memories that appear here in real time.
+                    </div>
+                </div>
+            </div>
+
             {/* ── Stats bar ─────────────────────────────────────────────────── */}
             <div className="stats">
                 <div className="stat">

@@ -5,23 +5,23 @@ import { TOOLS } from '@/data/tools';
 
 const PLUGPORT_URL = 'https://testnet.plugport.wtf';
 
-// ── JSON5-ish flexible parser ────────────────────────────────────────
+// ── Flexible JSON parser for raw-args input mode (reserved for future use) ──
+// Used when the playground switches to a single raw-JSON textarea instead of
+// per-field inputs. Handles bare key:value as fallback.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function parseArgs(raw: string): Record<string, unknown> {
     if (!raw.trim()) return {};
     try { return JSON.parse(raw); } catch { /* fall through */ }
-    // Try wrapping bare key:value as JSON
     try { return JSON.parse(`{${raw}}`); } catch { /* fall through */ }
     throw new Error('Invalid JSON. Use standard JSON format.');
 }
 
-// ── Execute a real PlugPort memory API call from the browser ─────────
+// ── Execute a PlugPort memory API call from the browser ──────────────
 async function callPlugPort(
     apiKey: string,
     tool: string,
     args: Record<string, unknown>,
 ): Promise<{ ok: boolean; result: unknown }> {
-    // Map MCP tool calls to direct PlugPort API calls
-    // (since this is a browser playground, we call PlugPort directly, not the MCP stdio server)
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -29,7 +29,6 @@ async function callPlugPort(
     };
 
     if (tool === 'remember') {
-        // Insert a memory document into the memories collection
         const { text, entities = [], relations = [], tags = [] } = args as Record<string, unknown>;
         const id = `mem_${Math.random().toString(36).slice(2, 10)}`;
         const now = new Date().toISOString();
@@ -50,13 +49,12 @@ async function callPlugPort(
     if (tool === 'recall') {
         const { query = '', limit = 10 } = args as Record<string, unknown>;
         const pattern = String(query).trim().split(/\s+/).filter(Boolean).join('|');
-        const body = {
-            filter: pattern ? { text: { $regex: pattern, $options: 'i' } } : {},
-            limit,
-        };
         const resp = await fetch(`${PLUGPORT_URL}/api/v1/collections/pag_memories/find`, {
             method: 'POST', headers,
-            body: JSON.stringify(body),
+            body: JSON.stringify({
+                filter: pattern ? { text: { $regex: pattern, $options: 'i' } } : {},
+                limit,
+            }),
         });
         const data = await resp.json();
         return { ok: resp.ok, result: data };

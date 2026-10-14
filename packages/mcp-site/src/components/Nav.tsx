@@ -4,18 +4,21 @@ export default function Nav() {
     return (
         <nav className="nav">
             <div className="nav-logo">
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                    <circle cx="11" cy="11" r="10" stroke="#7c5cfc" strokeWidth="1.5" />
-                    <circle cx="11" cy="11" r="4" fill="#7c5cfc" opacity="0.7" />
-                    <line x1="11" y1="1" x2="11" y2="6" stroke="#7c5cfc" strokeWidth="1.5" strokeLinecap="round" />
-                    <line x1="11" y1="16" x2="11" y2="21" stroke="#7c5cfc" strokeWidth="1.5" strokeLinecap="round" />
-                    <line x1="1" y1="11" x2="6" y2="11" stroke="#7c5cfc" strokeWidth="1.5" strokeLinecap="round" />
-                    <line x1="16" y1="11" x2="21" y2="11" stroke="#7c5cfc" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.png" alt="PlugPort" width={28} height={28} style={{ objectFit: 'contain' }} />
                 PlugPort Agent Graph
                 <span className="nav-pill">MCP</span>
             </div>
             <div className="nav-links">
+                <a
+                    className="nav-link"
+                    href="https://test-agent-graph.plugport.wtf/"
+                    target="_blank"
+                    rel="noopener"
+                    style={{ color: 'var(--accent-hi)', fontWeight: 600 }}
+                >
+                    Live Viewer ↗
+                </a>
                 <a className="nav-link" href="https://wiki-agent-graph.plugport.wtf" target="_blank" rel="noopener">Docs</a>
                 <a className="nav-link" href="https://testnet.plugport.wtf" target="_blank" rel="noopener">PlugPort</a>
             </div>
