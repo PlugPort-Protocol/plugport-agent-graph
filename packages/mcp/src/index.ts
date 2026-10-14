@@ -23,8 +23,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { agentGraphFromEnv } from '@pag/core';
 import { registerTools } from './tools.js';
 
-// Load .env from the repo root (three levels up from packages/mcp/src/index.ts)
-const envPath = fileURLToPath(new URL('../../../../.env', import.meta.url));
+// Load .env from the repo root (three levels up from packages/mcp/dist/index.js)
+const envPath = fileURLToPath(new URL('../../../.env', import.meta.url));
 if (existsSync(envPath)) process.loadEnvFile(envPath);
 
 const { memory, anchor, graph } = agentGraphFromEnv();
